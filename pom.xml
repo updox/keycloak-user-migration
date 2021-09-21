@@ -188,4 +188,40 @@
             </reporting>
         </profile>
     </profiles>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Central Mirror</name>
+            <url>https://nexus.updoxnet.com/content/groups/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Central Mirror</name>
+            <url>https://nexus.updoxnet.com/content/groups/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>updox</id>
+            <name>Updox Snapshots</name>
+            <url>https://nexus.updoxnet.com/repository/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>updox</id>
+            <name>Updox Releases</name>
+            <url>https://nexus.updoxnet.com/repository/releases/</url>
+        </repository>
+    </distributionManagement>
+    
 </project>
