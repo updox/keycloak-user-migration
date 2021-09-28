@@ -97,7 +97,10 @@ public class UserModelFactory {
     }
 
     private void validateUsernamesEqual(LegacyUser legacyUser, UserModel userModel) {
-        if (!userModel.getUsername().equals(legacyUser.getUsername())) {
+        // Keycloak stores the username as all lowercase, but the response from ud-api might include capitalization
+        // because we store them in `updox.user_info` retaining the capitalization (even though Catalyst logins
+        // are case-insensitive)
+        if (!userModel.getUsername().equalsIgnoreCase(legacyUser.getUsername())) {
             throw new IllegalStateException(String.format("Local and remote users differ: [%s != %s]",
                     userModel.getUsername(),
                     legacyUser.getUsername()));

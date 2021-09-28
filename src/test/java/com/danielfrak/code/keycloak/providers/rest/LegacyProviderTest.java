@@ -192,7 +192,7 @@ class LegacyProviderTest {
                 .thenReturn(password);
         when(legacyUserService.isPasswordValid(userId, password))
                 .thenReturn(true);
-        
+
         // JUnit was complaining about this "unnecessary" stub
         //        when(session.userCredentialManager())
         //                .thenReturn(mock(UserCredentialManager.class));
