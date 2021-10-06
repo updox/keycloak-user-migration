@@ -1,0 +1,19 @@
+<project name="Versioning" default="versionIt" basedir=".">
+
+  <description>
+    Update the all build number references to allow for dynamic versioning of lib dependencies.
+    Team City executes this as an Ant job and is not required for local development.
+  </description>
+
+
+  <target name="versionIt"
+          description="Update child pom with build number">
+
+    <replaceregexp flags="g" match="version>.*version>.{1}!-- TeamCity replaces this with the proper build number \(do not edit this comment\) -->"
+                   replace="version>${build.number}&lt;/version>">
+      <fileset dir=".">
+        <include name="**/pom.xml"/>
+      </fileset>
+    </replaceregexp>
+  </target>
+</project>
