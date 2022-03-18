@@ -56,6 +56,7 @@ public class UserModelFactory {
         LOG.infof("Creating user model for: %s", legacyUser.getUsername());
 
         UserModel userModel;
+
         if (isEmpty(legacyUser.getId())) {
             userModel = session.userLocalStorage().addUser(realm, legacyUser.getUsername());
         } else {
