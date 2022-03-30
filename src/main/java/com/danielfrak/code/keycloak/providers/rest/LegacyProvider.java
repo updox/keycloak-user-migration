@@ -15,7 +15,6 @@ import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -46,6 +45,25 @@ public class LegacyProvider implements UserStorageProvider,
 
     @Override
     public UserModel getUserByUsername(String username, RealmModel realm) {
+        if (session.getContext().getClient() == null) {
+            // for some reason, this plugin gets called even when trying to create users via Keycloak's REST API.
+            // This was causing a weird interaction where the following steps happened:
+            //   1. Keycloak got request to create a user
+            //   2. It decided to use this plugin to see if the user existed in the "external" (updox) storage system
+            //   3. If that were true, this plugin would automatically create the user
+            //   4. After this plugin executed, we would get back into Keycloak's normal user creation flow, which would
+            //      try to create the user *again*. That would fail as there would already be a user in the database
+            //      from the plugin with the same username
+            //   5. Collie or whoever tried to create the user via API would get a 404 telling them the user could not be
+            //      created because it already exists
+            // So if the session context client is null (which would only happen on API calls), skip this plugin entirely
+            // to ensure the API can do what it needs to do without someone stepping on its toes
+            LOG.error("Skipping legacy user lookup, client was not present in session context");
+            return null;
+        }
+
+        // this process was kicked off by a user attempting to log into a client that wasn't recognized by Keycloak,
+        // look them up in the "legacy" updox user store
         return getUserModel(realm, username, () -> legacyUserService.findByUsername(username));
     }
 
@@ -60,7 +78,9 @@ public class LegacyProvider implements UserStorageProvider,
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        return getUserModel(realm, email, () -> legacyUserService.findByEmail(email));
+        return null;
+        // we don't support login by email, keeping it commented out for future reference tho
+        //return getUserModel(realm, email, () -> legacyUserService.findByEmail(email));
     }
 
     @Override
