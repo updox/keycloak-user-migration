@@ -15,9 +15,11 @@ import static com.danielfrak.code.keycloak.providers.rest.ConfigurationPropertie
 public class RestUserService implements LegacyUserService {
 
     private final RestUserClient client;
+    private final Client restEasyClient;
 
     public RestUserService(ComponentModel model, Client restEasyClient) {
         String uri = model.getConfig().getFirst(URI_PROPERTY);
+        this.restEasyClient = restEasyClient;
         var tokenAuthEnabled = Boolean.parseBoolean(model.getConfig().getFirst(API_TOKEN_ENABLED_PROPERTY));
         if (tokenAuthEnabled) {
             String token = model.getConfig().getFirst(API_TOKEN_PROPERTY);
@@ -73,5 +75,10 @@ public class RestUserService implements LegacyUserService {
     public boolean isPasswordValid(String username, String password) {
         final Response response = client.validatePassword(username, new UserPasswordDto(password));
         return response.getStatus() == 200;
+    }
+
+    @Override
+    public void close() {
+        restEasyClient.close();
     }
 }

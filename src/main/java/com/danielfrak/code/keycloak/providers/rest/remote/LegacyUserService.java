@@ -31,4 +31,6 @@ public interface LegacyUserService {
      * @return true if password is valid.
      */
     boolean isPasswordValid(String username, String password);
+
+    void close();
 }

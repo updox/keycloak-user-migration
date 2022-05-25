@@ -58,7 +58,7 @@ public class LegacyProvider implements UserStorageProvider,
             //      created because it already exists
             // So if the session context client is null (which would only happen on API calls), skip this plugin entirely
             // to ensure the API can do what it needs to do without someone stepping on its toes
-            LOG.error("Skipping legacy user lookup, client was not present in session context");
+            LOG.debug("Skipping legacy user lookup, client was not present in session context");
             return null;
         }
 
@@ -128,7 +128,7 @@ public class LegacyProvider implements UserStorageProvider,
 
     @Override
     public void close() {
-        // Not needed
+        legacyUserService.close();
     }
 
     @Override
