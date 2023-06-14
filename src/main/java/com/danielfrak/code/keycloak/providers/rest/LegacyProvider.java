@@ -5,10 +5,10 @@ import com.danielfrak.code.keycloak.providers.rest.remote.LegacyUserService;
 import com.danielfrak.code.keycloak.providers.rest.remote.UserModelFactory;
 import org.jboss.logging.Logger;
 import org.keycloak.component.ComponentModel;
-import org.keycloak.credential.CredentialInput;
-import org.keycloak.credential.CredentialInputUpdater;
-import org.keycloak.credential.CredentialInputValidator;
+import org.keycloak.credential.*;
+import org.keycloak.credential.hash.PasswordHashProvider;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.PasswordPolicy;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
@@ -93,7 +93,13 @@ public class LegacyProvider implements UserStorageProvider,
         var validPassword = legacyUserService.isPasswordValid(userIdentifier, input.getChallengeResponse());
         if (validPassword && shouldMigrateUserPassword()) {
             // don't want to add passwords for users at first, can enable this after
-            session.userCredentialManager().updateCredential(realmModel, userModel, input);
+            final PasswordHashProvider hashProvider = session.getProvider(PasswordHashProvider.class, PasswordPolicy.HASH_ALGORITHM_DEFAULT);
+            // -1 indicates "use the default number of iterations"
+            final PasswordCredentialModel hashedPassword = hashProvider.encodedCredential(input.getChallengeResponse(), -1);
+            session.getProvider(CredentialProvider.class, PasswordCredentialProviderFactory.PROVIDER_ID)
+                    .createCredential(realmModel, userModel, hashedPassword);
+            // break the link to the federation provider
+            this.updateCredential(realmModel, userModel, input);
         }
 
         return validPassword;
