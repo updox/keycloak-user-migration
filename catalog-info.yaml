@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: keycloak-user-migration
+  description: A Keycloak plugin for migrating users from legacy systems
+  annotations:
+    business-unit: EverHealth
+    github.com/project-slug: updox/keycloak-user-migration
+    product: UPD
+spec:
+  type: service
+  lifecycle: production
+  owner: EverHealth
+  implementation:
+    languages:
+    - Java
+    - Dockerfile
